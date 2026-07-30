@@ -1,0 +1,1 @@
+worker: python slippiesbot.py
