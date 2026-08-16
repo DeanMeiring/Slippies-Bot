@@ -18,3 +18,4 @@ A Telegram bot that logs and saves expenses straight from a chat message — no 
 ## Status
 
 Working prototype. V2 is currently in development with expanded features.
+<img width="1916" height="973" alt="image" src="https://github.com/user-attachments/assets/b6427615-3589-4d4e-871a-f9482222295d" />
