@@ -37,11 +37,15 @@ def init_db():
 
 
 def seed_default_codes():
-    # Only runs once - won't overwrite if codes already exist in the DB
-    defaults = {
-        "DEAN777": "Dean_Slips_Backlog.xlsx",
-        "JOHAN888": "Johan_Slips_Backlog.xlsx"
-    }
+    # Only seeds codes actually provided via env vars - never hardcoded, so the
+    # source is safe to make public without exposing a working login code.
+    defaults = {}
+    if os.environ.get("DEAN_LOGIN_CODE"):
+        defaults[os.environ["DEAN_LOGIN_CODE"]] = "Dean_Slips_Backlog.xlsx"
+    if os.environ.get("JOHAN_LOGIN_CODE"):
+        defaults[os.environ["JOHAN_LOGIN_CODE"]] = "Johan_Slips_Backlog.xlsx"
+    if not defaults:
+        return
     conn = sqlite3.connect(DB_FILE)
     cur = conn.cursor()
     for code, filename in defaults.items():
@@ -100,7 +104,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def login(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
     if not context.args:
-        await update.message.reply_text("Usage: /login DEAN777")
+        await update.message.reply_text("Usage: /login YOURCODE")
         return
     code = context.args[0].upper()
     filename = get_filename_for_code(code)
@@ -197,7 +201,7 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 if __name__ == '__main__':
     init_db()
-    seed_default_codes()  # ensures DEAN777 / JOHAN888 exist on first run, harmless after
+    seed_default_codes()  # only seeds codes set via DEAN_LOGIN_CODE / JOHAN_LOGIN_CODE env vars
 
     application = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
     application.add_handler(CommandHandler("start", start))
